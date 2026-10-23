@@ -221,7 +221,7 @@ AI coding assistants were used to scaffold bare bones of the project, setup Temp
 * Tickets and KB articles are in English. 
 * Database is small enough to fit in memory for this demonstration using BM25 search.
 * A single 24-hour approval SLA is sufficient for all refund decisions.
-* Escalation to human support is acceptable for any rule violation or prompt injection attempt.
+* Escalation to human support is acceptable for any rule violation, unknown decisions for fake LLM or prompt injection attempt.
 
 ### Limitations
 * `FakeActivityToolsAPI` uses in-memory dictionaries for idempotency; restarts clear the deduplication cache.
