@@ -1,0 +1,66 @@
+services:
+  temporal:
+    image: temporalio/auto-setup:1.24.2
+    container_name: temporal-server
+    ports:
+      - "7233:7233"
+    environment:
+      - DB=sqlite
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    volumes:
+      - temporal-data:/etc/temporal
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "7233"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  temporal-ui:
+    image: temporalio/ui:2.30.0
+    container_name: temporal-web-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:8080
+    depends_on:
+      - temporal
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: northdesk-api
+    ports:
+      - "8001:8001"
+    environment:
+      - TEMPORAL_HOST=temporal:7233
+      - TEMPORAL_NAMESPACE=default
+      - TEMPORAL_TASK_QUEUE=ticket-processing-queue
+      - LLM_MODE=fake
+      - HELPDESK_FAILURE_RATE=0.0
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8001
+      - LOG_LEVEL=INFO
+    depends_on:
+      - temporal
+    command: ["python", "main.py", "--role", "api"]
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: northdesk-worker
+    environment:
+      - TEMPORAL_HOST=temporal:7233
+      - TEMPORAL_NAMESPACE=default
+      - TEMPORAL_TASK_QUEUE=ticket-processing-queue
+      - LLM_MODE=fake
+      - HELPDESK_FAILURE_RATE=0.0
+      - LOG_LEVEL=INFO
+    depends_on:
+      - temporal
+    command: ["python", "main.py", "--role", "worker"]
+
+volumes:
+  temporal-data:
