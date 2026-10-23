@@ -38,7 +38,7 @@ services:
       - TEMPORAL_NAMESPACE=default
       - TEMPORAL_TASK_QUEUE=ticket-processing-queue
       - LLM_MODE=fake
-      - HELPDESK_FAILURE_RATE=0.0
+      - ACTIVITYTOOLS_FAILURE_RATE=0.0
       - APP_HOST=0.0.0.0
       - APP_PORT=8001
       - LOG_LEVEL=INFO

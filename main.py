@@ -6,8 +6,8 @@ import argparse
 import asyncio
 import sys
 import uvicorn
-from app.config import get_settings
-from app.temporal.worker import run_worker
+from scripts.config import get_settings
+from scripts.temporal.worker import run_worker
 
 
 def main():
@@ -22,7 +22,7 @@ def main():
     settings = get_settings()
 
     if args.role == "api":
-        uvicorn.run("app.api.main:app", host=settings.APP_HOST, port=settings.APP_PORT, reload=False)
+        uvicorn.run("scripts.front_api.main:app", host=settings.APP_HOST, port=settings.APP_PORT, reload=False)
     elif args.role == "worker":
         asyncio.run(run_worker())
     # Local debugging: run both API and worker in the same process
@@ -30,7 +30,7 @@ def main():
         import threading
         t = threading.Thread(target=lambda: asyncio.run(run_worker()), daemon=True)
         t.start()
-        uvicorn.run("app.api.main:app", host=settings.APP_HOST, port=settings.APP_PORT, reload=False)
+        uvicorn.run("scripts.front_api.main:app", host=settings.APP_HOST, port=settings.APP_PORT, reload=False)
 
 
 if __name__ == "__main__":
