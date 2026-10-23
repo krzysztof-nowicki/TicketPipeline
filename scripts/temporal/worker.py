@@ -22,11 +22,24 @@ async def run_worker() -> None:
         f"Connecting worker to Temporal server at {settings.TEMPORAL_HOST} (namespace: {settings.TEMPORAL_NAMESPACE})"
     )
 
-    client = await Client.connect(
-        settings.TEMPORAL_HOST,
-        namespace=settings.TEMPORAL_NAMESPACE,
-        data_converter=pydantic_data_converter,
-    )
+    client = None
+    for attempt in range(1, 31):
+        try:
+            client = await Client.connect(
+                settings.TEMPORAL_HOST,
+                namespace=settings.TEMPORAL_NAMESPACE,
+                data_converter=pydantic_data_converter,
+            )
+            logger.info("Worker connected to Temporal server successfully.")
+            break
+        except Exception as err:
+            if attempt == 30:
+                logger.error(f"Failed to connect worker to Temporal after 30 attempts: {err}")
+                raise
+            logger.warning(
+                f"Temporal server not ready yet (attempt {attempt}/30). Retrying in 2 seconds..."
+            )
+            await asyncio.sleep(2)
 
     worker = Worker(
         client,

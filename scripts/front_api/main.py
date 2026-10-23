@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi import FastAPI
@@ -21,19 +22,24 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info(
             f"FastAPI application starting up. Connecting to Temporal at {settings.TEMPORAL_HOST}..."
         )
-        try:
-            temporal_client = await Client.connect(
-                settings.TEMPORAL_HOST,
-                namespace=settings.TEMPORAL_NAMESPACE,
-                data_converter=pydantic_data_converter,
-            )
-            app.state.temporal_client = temporal_client
-            logger.info("Connected to Temporal server successfully.")
-        except Exception as err:
-            logger.warning(
-                f"Could not connect to Temporal during startup: {err}. Endpoints requiring Temporal may fail until connected."
-            )
-            app.state.temporal_client = None
+        for attempt in range(1, 16):
+            try:
+                temporal_client = await Client.connect(
+                    settings.TEMPORAL_HOST,
+                    namespace=settings.TEMPORAL_NAMESPACE,
+                    data_converter=pydantic_data_converter,
+                )
+                app.state.temporal_client = temporal_client
+                logger.info("Connected to Temporal server successfully.")
+                break
+            except Exception as err:
+                if attempt == 15:
+                    logger.warning(
+                        f"Could not connect to Temporal during startup: {err}. Endpoints requiring Temporal may fail until connected."
+                    )
+                    app.state.temporal_client = None
+                else:
+                    await asyncio.sleep(1)
 
     yield
 
@@ -49,6 +55,14 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(tickets_router)
+
+    @app.get("/", tags=["System"])
+    async def root():
+        return {
+            "message": "Northdesk Agentic Ticket Workflow API",
+            "docs_url": "/docs",
+            "health_url": "/health",
+        }
 
     @app.get("/health", tags=["System"])
     async def health_check():
