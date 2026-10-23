@@ -75,7 +75,7 @@ class DataManager:
         - Tokenizes query into words.
         - Corrects misspelled words if similarity >= fuzzy_threshold.
         - Ranks matching KB articles using standard BM25 formula.
-        - Filters out low-relevance matches below min_score (e.g. single stopword matches).
+        - Filters out low-relevance matches below min_score.
         """
         query_tokens = _tokenize(query)
         if not query_tokens:
