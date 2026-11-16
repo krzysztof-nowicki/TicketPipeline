@@ -17,7 +17,7 @@ from scripts.utils.rules import validate_and_sanitize_decision
 def sample_customer() -> Customer:
     return Customer(
         customer_id="C-100",
-        name="Northwind Bakery",
+        name="NovaScale Systems",
         plan="business",
         status="active",
     )

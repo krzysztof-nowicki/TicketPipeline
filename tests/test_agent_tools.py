@@ -5,7 +5,7 @@ def test_tool_get_customer():
     res = execute_tool("get_customer", {"customer_id": "C-100"})
     assert isinstance(res, dict)
     assert res.get("customer_id") == "C-100"
-    assert res.get("name") == "Northwind Bakery"
+    assert res.get("name") == "NovaScale Systems"
 
     # Missing customer
     err = execute_tool("get_customer", {"customer_id": "C-UNKNOWN"})

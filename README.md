@@ -1,6 +1,7 @@
-# Northdesk Agentic Ticket Workflow Service
+# PulseOps Agentic Ticket Workflow Service
 
-An autonomous customer support ticket processing pipeline built with **FastAPI**, **Temporal**, and an **LLM Agent** architecture with human-in-the-loop approvals, business rule sanitization, and offline execution capabilities.
+An example autonomous customer support ticket processing pipeline built with **FastAPI**, **Temporal**, and an **LLM Agent** architecture with human-in-the-loop approvals, business rule sanitization, and offline execution capabilities.
+Created to learn how to build a production-ready LLM agentic workflow system with Temporal, this project demonstrates how to orchestrate LLMs, external tools, and human reviewers in a deterministic workflow.
 
 ---
 
@@ -45,8 +46,8 @@ curl -X POST http://localhost:8001/tickets \
   -d '{
     "ticket_id": "T-1",
     "customer_id": "C-200",
-    "subject": "Can'\''t log in",
-    "body": "I forgot my password and can'\''t get into my account."
+    "subject": "Can'\''t log in to developer console",
+    "body": "I forgot my password and can'\''t get into my account to deploy our services."
   }'
 ```
 **Response (`202 Accepted`):**
@@ -76,7 +77,7 @@ curl http://localhost:8001/tickets/T-1
     "priority": "normal",
     "action": {
       "type": "reply",
-      "message": "Open the sign-in page, choose 'Forgot password' and follow the link we email you.",
+      "message": "To regain access to the PulseOps Cloud console, open the sign-in page, choose 'Forgot password' and follow the secure link emailed to you.",
       "article_ids": ["KB-1"]
     }
   },
@@ -189,33 +190,7 @@ Customer-submitted text is treated as **untrusted data**. Rules are protected us
      * Refund amount must be $> 0$ and $\le$ invoice total.
    * If any check fails, the decision is sanitized to an escalation before any activity can execute it.
 
----
-
-## 7. Production Deployment to Azure
-
-* Unfortunately i do not have much experience with Azure, but based on Azure documentation, both API and workers would be deployed to Azure Container Apps.
-Temporal server could be self-hosted on Azure Kubernetes Service (AKS) or managed via Temporal Cloud.
-The LLM service would be accessed via Azure OpenAI Service with private endpoints for security.
-Local models could be run in either GPU-enabled containers or Azure Machine Learning compute instances, depending on the security and latency requirements.
-
-* Sensitive data and secrets would be stored in Azure Key Vault, and the application would use Managed Identities to access them securely without hardcoding secrets.
-
----
-
-## 8. AI Coding Assistants: Usage & Error Resolution
-
-AI coding assistants were used to scaffold bare bones of the project, setup Temporal workflow and FastAPI frontend, and write mock test fixtures.
-
-### Example where assistant output required correction:
-* **Issue (FakeLLMAgent):**
-  When creating the bare fake LLM agent, the assistant generated `FakeLLMAgent` that was hard coded to fix every problem in example tickets instead of returning a base.
-* **How it was caught:**
-  When actually implementing FakeLLMAgent, the code was clearly hard coded based on examples.
-* **Resolution:**
-  Used base that AI assistant generated, and rewrote the code inside to a generic algorithm that returns a structured decision based on ticket content, customer data, and KB search results.
----
-
-## 9. Assumptions, Limitations & Next Steps
+## 7. Assumptions, Limitations & Next Steps
 
 ### Assumptions
 * Tickets and KB articles are in English. 

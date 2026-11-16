@@ -6,7 +6,7 @@ def test_data_manager_loads_customers():
     customer = dm.get_customer("C-100")
     assert customer is not None
     assert customer.customer_id == "C-100"
-    assert customer.name == "Northwind Bakery"
+    assert customer.name == "NovaScale Systems"
     assert customer.plan == "business"
 
     # Non-existent customer

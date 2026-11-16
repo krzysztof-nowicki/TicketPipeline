@@ -28,7 +28,7 @@ from scripts.temporal.workflows import ApprovalSignal, TicketWorkflow
 def sample_customer_c100() -> Customer:
     return Customer(
         customer_id="C-100",
-        name="Northwind Bakery",
+        name="NovaScale Systems",
         plan="business",
         status="active",
     )
@@ -68,7 +68,7 @@ async def test_workflow_ticket_answered():
             ),
             customer=Customer(
                 customer_id="C-200",
-                name="Contoso Labs",
+                name="Vortex Data Labs",
                 plan="free",
                 status="active",
             ),
@@ -257,7 +257,7 @@ async def test_workflow_activity_retry_success():
             ),
             customer=Customer(
                 customer_id="C-200",
-                name="Contoso Labs",
+                name="Vortex Data Labs",
                 plan="free",
                 status="active",
             ),
